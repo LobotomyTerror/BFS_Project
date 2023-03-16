@@ -184,6 +184,7 @@ void Graph<T>::BFS(Graph G, T src, T dest)
         }
         else
             next_node = next_node->next;
+    }
 }
 
 template<typename T>
