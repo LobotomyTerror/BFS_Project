@@ -1,10 +1,3 @@
-//
-//  main.cpp
-//  practice
-//
-//  Created by Daniel Fishbein on 3/8/23.
-//
-
 #include <iostream>
 
 template<typename T>
@@ -173,22 +166,24 @@ void Graph<T>::BFS(Graph G, T src, T dest)
     
     while (G.getSize() != 0)
     {
-        if (vistedV[next_node->data] == true) //Need to fix this check to make it where it will check if the next_node afterwards is already checked.
-            next_node = next_node->next;
-        if (next_node != nullptr)
+       if (next_node == nullptr || vistedV[next_node->data] == false)
         {
-            vistedV[next_node->data] = true;
-            G.enqueue(next_node->data);
-            next_node = next_node->next;
+            if (next_node != nullptr)
+            {
+                vistedV[next_node->data] = true;
+                G.enqueue(next_node->data);
+                next_node = next_node->next;
+            }
+            else
+            {
+                G.dequeue();
+                next_node = G.getData();
+                next_node = adj[next_node->data];
+                next_node = next_node->next;
+            }
         }
-        if (next_node == nullptr)
-        {
-            G.dequeue();
-            next_node = G.getData();
-            next_node = adj[next_node->data];
+        else
             next_node = next_node->next;
-        }
-    }
 }
 
 template<typename T>
