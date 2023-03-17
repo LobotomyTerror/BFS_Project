@@ -5,7 +5,6 @@ class Node
 {
 public:
     Node<T>* next;
-    Node<T>* prev;
     T data;
     
     Node();
@@ -15,14 +14,14 @@ public:
 template<typename T>
 Node<T>::Node()
 {
-    next = prev = nullptr;
+    next  = nullptr;
 }
 
 template<typename T>
 Node<T>::Node(T d)
 {
     this->data = d;
-    next = prev = nullptr;
+    next  = nullptr;
 }
 
 template<typename T>
@@ -40,7 +39,7 @@ public:
     void initGraph(int V);
     void createLink(T src, T dest);
     void print();
-    void BFS(Graph, T, T);
+    void BFS(T, T);
     void enqueue(T);
     void dequeue();
     int getSize();
@@ -57,9 +56,9 @@ Graph<T>::Graph()
 template<typename T>
 Graph<T>::~Graph()
 {
-    for (int i = 0; i < numOfVertices; ++i)
-        delete adj[i];
-    delete[] adj;
+//    for (int i = 0; i < numOfVertices; ++i)
+//        delete adj[i];
+    delete adj;
 }
 
 template<typename T>
@@ -81,25 +80,24 @@ void Graph<T>::createLink(T v, T e)
     Node<T>* temp1 = new Node<T>(v);
     Node<T>* temp2 = new Node<T>(e);
     Node<T>* last_node;
+    Node<T>* first_node;
     
     if (temp1->data == temp2->data)
     {
+        temp1 = temp2;
         adj[v] = temp1;
-        last_node = temp2;
-        adj[v] = last_node;
     }
     else if (adj[v] == nullptr)
     {
-        adj[v] = temp1;
+        first_node = temp1;
         last_node = temp2;
-        adj[v]->next = last_node;
-        last_node->prev = adj[v];
+        first_node->next = last_node;
+        adj[v] = first_node;
     }
     else
     {
         last_node->next = temp2;
         last_node = last_node->next;
-        last_node->prev = adj[v];
     }
     ++numOfEdges;
 }
@@ -135,7 +133,6 @@ void Graph<T>::dequeue()
         return;
     
     head = head->next;
-    head->prev = nullptr;
     
     if (head == nullptr)
         tail = nullptr;
@@ -151,35 +148,48 @@ Node<T>* Graph<T>::getData()
 }
 
 template<typename T>
-void Graph<T>::BFS(Graph G, T src, T dest)
+void Graph<T>::BFS(T src, T dest)
 {
     bool vistedV[numOfVertices];
+    int distTo[numOfVertices];
     Node<T>* next_node;
+    Node<T>* curr;
+    Node<T>* tempArr[numOfVertices];
     
     for (int i = 0; i < numOfVertices; ++i)
+    {
         vistedV[i] = false;
+        distTo[i] = 0;
+        tempArr[i] = adj[i];
+    }
     
+    distTo[src] = 0;
     vistedV[src] = true;
-    G.enqueue(src);
-    next_node = adj[src];
+    enqueue(src);
+    next_node = curr = tempArr[src];
     next_node = next_node->next;
     
-    while (G.getSize() != 0)
+    while (getSize() != 0)
     {
-       if (next_node == nullptr || vistedV[next_node->data] == false)
+        if (next_node == nullptr || vistedV[next_node->data] == false)
         {
             if (next_node != nullptr)
             {
                 vistedV[next_node->data] = true;
-                G.enqueue(next_node->data);
+                enqueue(next_node->data);
+                distTo[next_node->data] = distTo[curr->data] + 1;
                 next_node = next_node->next;
             }
             else
             {
-                G.dequeue();
-                next_node = G.getData();
-                next_node = adj[next_node->data];
-                next_node = next_node->next;
+                dequeue();
+                next_node = getData();
+                if (next_node != nullptr)
+                {
+                    next_node = tempArr[next_node->data];
+                    curr = next_node;
+                    next_node = next_node->next;
+                }
             }
         }
         else
@@ -265,6 +275,7 @@ int main(int argc, const char * argv[])
     G.createLink(27, 3);
     G.createLink(27, 16);
     G.createLink(27, 26);
+    G.createLink(27, 2);
     G.createLink(28, 25);
     G.createLink(28, 15);
     G.createLink(28, 29);
@@ -278,11 +289,13 @@ int main(int argc, const char * argv[])
     
     //G.print();
     
-    std::cout << "Enter a source node and a destiniation node to see the shortest path\n";
-    int src, dest;
-    std::cin >> src >> dest;
-    
-    G.BFS(G, src, dest);
+//    std::cout << "Enter a source node and a destiniation node to see the shortest path\n";
+//    int src, dest;
+//    std::cin >> src >> dest;
+//
+    G.BFS(0, 32);
+
+    G.print();
     
     return 0;
 }
