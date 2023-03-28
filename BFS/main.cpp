@@ -37,9 +37,9 @@ public:
     Graph();
     ~Graph();
     void initGraph(int V);
-    void createLink(T src, T dest);
+    void createLink(T, T);
     void print();
-    void BFS(T, T);
+    void BFS(T, T, int[], int[], int[]);
     void enqueue(T);
     void dequeue();
     int getSize();
@@ -56,8 +56,8 @@ Graph<T>::Graph()
 template<typename T>
 Graph<T>::~Graph()
 {
-//    for (int i = 0; i < numOfVertices; ++i)
-//        delete adj[i];
+    for (int i = 0; i < numOfVertices; ++i)
+        delete adj[i];
     delete adj;
 }
 
@@ -147,11 +147,18 @@ Node<T>* Graph<T>::getData()
     return this->head;
 }
 
+//Breadth-first search to find the shortest path from a
+//user-defined source node to a destination node...
 template<typename T>
-void Graph<T>::BFS(T src, T dest)
+void Graph<T>::BFS(T src, T dest, int pathTo[], int destTo[], int pred[])
+//For this to work we need to set a pathTo array, distTo array and an index array
+//to store the path from the source node to the destination node
+//along with the dist to array to store the edges from the two nodes
+//then an index to have the starting node and destination node in the same array to
+//loop back through and find the path from dest to src, then we flip it to show the details.
 {
+    int i = 0;
     bool vistedV[numOfVertices];
-    int distTo[numOfVertices];
     Node<T>* next_node;
     Node<T>* curr;
     Node<T>* tempArr[numOfVertices];
@@ -159,41 +166,39 @@ void Graph<T>::BFS(T src, T dest)
     for (int i = 0; i < numOfVertices; ++i)
     {
         vistedV[i] = false;
-        distTo[i] = 0;
         tempArr[i] = adj[i];
     }
     
-    distTo[src] = 0;
     vistedV[src] = true;
-    enqueue(src);
     next_node = curr = tempArr[src];
     next_node = next_node->next;
+    pathTo[i] = curr->data;
+    destTo[curr->data] = 0;
+    pred[i] = -1;
+    enqueue(curr->data);
     
     while (getSize() != 0)
     {
-        if (next_node == nullptr || vistedV[next_node->data] == false)
+        while (next_node != nullptr)
         {
-            if (next_node != nullptr)
+            if (vistedV[next_node->data] == false)
             {
-                vistedV[next_node->data] = true;
+                ++i;
+                pathTo[i] = next_node->data; //stores the node we are currently at
+                pred[i] = curr->data; //predecessor to the node we are currently at
+                destTo[next_node->data] = destTo[curr->data] + 1; //sets the arr element to the number edges from the src node
+                vistedV[next_node->data] = true; //just a check if the node has already been visted
                 enqueue(next_node->data);
-                distTo[next_node->data] = distTo[curr->data] + 1;
-                next_node = next_node->next;
+                std::cout << pathTo[i] << ' '  << pred[i] << ' ' << destTo[next_node->data] << '\n';
             }
-            else
-            {
-                dequeue();
-                next_node = getData();
-                if (next_node != nullptr)
-                {
-                    next_node = tempArr[next_node->data];
-                    curr = next_node;
-                    next_node = next_node->next;
-                }
-            }
+            next_node = next_node->next; //advance the node keeping it moving so we can check the if there is any more links to the curr node
         }
-        else
+        dequeue();
+        if ((next_node = getData()) != nullptr) //this gets the data from the head element such that if it is not NULL then we can advance the pointers
+        {
+            next_node = curr = tempArr[next_node->data]; //as mentioned above also it stops from any bad_access issues
             next_node = next_node->next;
+        }
     }
 }
 
@@ -216,12 +221,22 @@ void Graph<T>::print()
 
 int main(int argc, const char * argv[])
 {
+    //three arrays pathTo, pred, and distTo
+    //these three will be used to store each node,
+    //which node is a predecessor of that node, and
+    //the number of edges from the src node
+    
     int V;
     Graph<int> G;
     std::cout << "Enter the total amount of vertices: ";
     std::cin >> V;
 
     G.initGraph(V);
+    
+    //three array declrations
+    int pathTo[V];
+    int distTo[V];
+    int pred[V];
     
     G.createLink(0, 8);
     G.createLink(1, 3);
@@ -287,13 +302,15 @@ int main(int argc, const char * argv[])
     G.createLink(32, 23);
     G.createLink(32, 25);
     
-    //G.print();
+    //init of the three arrays
+    for (int i = 0; i < V; ++i)
+    {
+        pathTo[i] = 0;
+        distTo[i] = 0;
+        pred[i] = 0;
+    }
     
-//    std::cout << "Enter a source node and a destiniation node to see the shortest path\n";
-//    int src, dest;
-//    std::cin >> src >> dest;
-//
-    G.BFS(0, 32);
+    G.BFS(7, 31, pathTo, distTo, pred); //this will change to a seperate function to print these details, just temp for now
 
     G.print();
     
