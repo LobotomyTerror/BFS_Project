@@ -38,8 +38,8 @@ public:
     ~Graph();
     void initGraph(int V);
     void createLink(T, T);
-    void print();
-    void BFS(T, T, int[], int[], int[]);
+    void print(T, T, T, T);
+    void BFS(T, int[], int[], int[]);
     void enqueue(T);
     void dequeue();
     int getSize();
@@ -150,12 +150,12 @@ Node<T>* Graph<T>::getData()
 //Breadth-first search to find the shortest path from a
 //user-defined source node to a destination node...
 template<typename T>
-void Graph<T>::BFS(T src, T dest, int pathTo[], int destTo[], int pred[])
-//For this to work we need to set a pathTo array, distTo array and an index array
-//to store the path from the source node to the destination node
-//along with the dist to array to store the edges from the two nodes
-//then an index to have the starting node and destination node in the same array to
-//loop back through and find the path from dest to src, then we flip it to show the details.
+void Graph<T>::BFS(T src, int pathTo[], int destTo[], int pred[])
+/*For this to work we need to set a pathTo array, distTo array and an index array
+to store the path from the source node to the destination node
+along with the dist to array to store the edges from the two nodes
+then an index to have the starting node and destination node in the same array to
+loop back through and find the path from dest to src, then we flip it to show the details.*/
 {
     int i = 0;
     bool vistedV[numOfVertices];
@@ -184,59 +184,75 @@ void Graph<T>::BFS(T src, T dest, int pathTo[], int destTo[], int pred[])
             if (vistedV[next_node->data] == false)
             {
                 ++i;
-                pathTo[i] = next_node->data; //stores the node we are currently at
-                pred[i] = curr->data; //predecessor to the node we are currently at
+                pathTo[i] = next_node->data;                                   //stores the node we are currently at
+                pred[i] = curr->data;                                               //predecessor to the node we are currently at
                 destTo[next_node->data] = destTo[curr->data] + 1; //sets the arr element to the number edges from the src node
-                vistedV[next_node->data] = true; //just a check if the node has already been visted
+                vistedV[next_node->data] = true;                           //just a check if the node has already been visted
                 enqueue(next_node->data);
-                std::cout << pathTo[i] << ' '  << pred[i] << ' ' << destTo[next_node->data] << '\n';
             }
-            next_node = next_node->next; //advance the node keeping it moving so we can check the if there is any more links to the curr node
+            next_node = next_node->next;  //advance the node keeping it moving so we
+                                                            //can check the if there is any more links to the curr node
         }
         dequeue();
-        if ((next_node = getData()) != nullptr) //this gets the data from the head element such that if it is not NULL then we can advance the pointers
+        if ((next_node = getData()) != nullptr) //this gets the data from the head element such that if
+                                                                    //it is not NULL then we can advance the pointers
         {
-            next_node = curr = tempArr[next_node->data]; //as mentioned above also it stops from any bad_access issues
+            next_node = curr = tempArr[next_node->data];  //as mentioned above also it stops from any bad_access issues
+                                                                                    //if the element in the array goes out of bounds
             next_node = next_node->next;
         }
     }
 }
 
 template<typename T>
-void Graph<T>::print()
-{
-    for (int i = 0; i < numOfVertices; ++i)
-    {
-        std::cout << i << "->";
-        for (int j = 0; adj[i]->next != nullptr; ++j)
-        {
-            std::cout << adj[i]->next->data << "->";
-            adj[i] = adj[i]->next;
-        }
-        std::cout << "NULL";
-        std::cout << '\n';
-    }
-    std::cout << numOfEdges << '\n';
-}
-
-int main(int argc, const char * argv[])
+void Graph<T>::print(T src, T dest_one, T dest_two, T dest_three)
 {
     //three arrays pathTo, pred, and distTo
     //these three will be used to store each node,
     //which node is a predecessor of that node, and
     //the number of edges from the src node
     
+    //three array declrations
+    int pathTo[numOfVertices];
+    int distTo[numOfVertices];
+    int pred[numOfVertices];
+    
+    for (int i = 0; i < numOfVertices; ++i) //init of the three arrays
+    {
+        pathTo[i] = 0;
+        distTo[i] = 0;
+        pred[i] = 0;
+    }
+    BFS(src, pathTo, distTo, pred);
+    
+    for (int i = 0; i < numOfVertices; ++i)
+    {
+        if (pathTo[i] == dest_one || pathTo[i] == dest_two || pathTo[i] == dest_three)
+        {
+            std::cout << pathTo[i] << ' ';
+            int node = pred[i];
+            
+            for (int j = i; j >= 0; --j)
+            {
+                if (pathTo[j] == node)
+                {
+                    std::cout << pathTo[j] << ' ';
+                    node = pred[j];
+                }
+            }
+            std::cout << '\n';
+        }
+    }
+}
+
+int main(int argc, const char * argv[])
+{
     int V;
     Graph<int> G;
     std::cout << "Enter the total amount of vertices: ";
     std::cin >> V;
 
     G.initGraph(V);
-    
-    //three array declrations
-    int pathTo[V];
-    int distTo[V];
-    int pred[V];
     
     G.createLink(0, 8);
     G.createLink(1, 3);
@@ -301,19 +317,17 @@ int main(int argc, const char * argv[])
     G.createLink(32, 31);
     G.createLink(32, 23);
     G.createLink(32, 25);
-    
-    //init of the three arrays
-    for (int i = 0; i < V; ++i)
-    {
-        pathTo[i] = 0;
-        distTo[i] = 0;
-        pred[i] = 0;
-    }
-    
-    G.BFS(7, 31, pathTo, distTo, pred); //this will change to a seperate function to print these details, just temp for now
 
-    G.print();
+    /*All the information stated below is going to change to member objects along with the use of overloaded fucntions >> and <<*/
+//    std::cout << "Enter three starting integers to see there shortest path to three destination nodes\n";
+//    int src_one, src_two, src_three;
+//    std::cin >> src_one >> src_two >> src_three;
+//    std::cout << "Enter three destination nodes as integers\n";
+//    int dest_one, dest_two, dest_three;
+//    std::cin >> dest_one >> dest_two >> dest_three;
     
+//    G.print(src_one, dest_one, dest_two, dest_three);
+    G.print(7, 32, 22, 3);
     return 0;
 }
 
