@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <cstring>
 
 template<typename T>
 class Node
@@ -86,6 +88,7 @@ void Graph<T>::createLink(T v, T e)
     {
         temp1 = temp2;
         adj[v] = temp1;
+        ++numOfVertices;
     }
     else if (adj[v] == nullptr)
     {
@@ -93,11 +96,16 @@ void Graph<T>::createLink(T v, T e)
         last_node = temp2;
         first_node->next = last_node;
         adj[v] = first_node;
+        ++numOfVertices;
     }
     else
     {
+        first_node = adj[v];
+        last_node = first_node->next;
+        while (last_node->next != nullptr)
+            last_node = last_node->next;
         last_node->next = temp2;
-        last_node = last_node->next;
+        adj[v] = first_node;
     }
     ++numOfEdges;
 }
@@ -230,14 +238,20 @@ void Graph<T>::print(T src, T dest_one, T dest_two, T dest_three)
         if (pathTo[i] == dest_one || pathTo[i] == dest_two || pathTo[i] == dest_three)
         {
             std::cout << pathTo[i] << ' ';
-            int node = pred[i];
+            int pnode = pred[i];
+            int cnode = pathTo[i];
+//            int dnode = distTo[i];
+            //int tempArr[i];
+            //tempArr[i] = cnode;
             
             for (int j = i; j >= 0; --j)
             {
-                if (pathTo[j] == node)
+                if (pathTo[j] == pnode)
                 {
                     std::cout << pathTo[j] << ' ';
-                    node = pred[j];
+                    pnode = pred[j];
+                    //if (pnode != -1)
+                        //tempArr[j] = pnode;
                 }
             }
             std::cout << '\n';
@@ -245,89 +259,68 @@ void Graph<T>::print(T src, T dest_one, T dest_two, T dest_three)
     }
 }
 
+
+//This function reads in ordered pairs and populates our graph
+//Because we can't use the string library, I had to find some creative ways to make a sub-Cstring
+//It's kind of ugly but it works
+void readData(Graph<int>& G) {
+    G.initGraph(0);
+    int node1 = 0;
+    int node2 = 0;
+    int comma = 0;
+    char fileline[10] = "6, 9";
+    //char nodes for sub-Cstrings
+    char cnode1[10] = "   ";
+    char cnode2[10] = "   ";
+
+    // strncpy (cnode1, fileline, sizeof(cnode1));
+
+    //read in from file
+    std::ifstream fin("data.txt");
+    //store data in fileline
+    while(fin.getline(fileline, 100)) {
+        for(int i = 0; i < 10; i++) {
+            //Find where the comma is in the pair
+            if(fileline[i] == ',') {
+                comma = i;
+                break;
+            }
+        }
+
+        //Make a substring for the first node based on where the comma is
+        strncpy(cnode1, fileline, comma);
+
+        //Convert that substring to an int
+        node1 = atoi(cnode1);
+        
+        for(int i = 0; i < 10; i++) {
+            //Remove all values before and including the comma
+            if(i == comma) {
+                fileline[i] = ' ';
+                break;
+            }
+            fileline[i] = ' ';
+        }
+
+        //Make substring for second node
+        strncpy(cnode2, fileline, 10);
+
+        //Convert substring to an int
+        node2 = atoi(cnode2);
+
+        //std::cout << node1 << ", " << node2 << std::endl;
+        G.createLink(node1, node2);
+    }
+}
+
 int main(int argc, const char * argv[])
 {
-    int V;
     Graph<int> G;
-    std::cout << "Enter the total amount of vertices: ";
-    std::cin >> V;
-
-    G.initGraph(V);
-    
-    G.createLink(0, 8);
-    G.createLink(1, 3);
-    G.createLink(2, 0);
-    G.createLink(3, 1);
-    G.createLink(3, 22);
-    G.createLink(3, 27);
-    G.createLink(4, 21);
-    G.createLink(5, 4);
-    G.createLink(5, 21);
-    G.createLink(5, 6);
-    G.createLink(6, 4);
-    G.createLink(6, 7);
-    G.createLink(7, 1);
-    G.createLink(7, 8);
-    G.createLink(7, 6);
-    G.createLink(8, 7);
-    G.createLink(8, 12);
-    G.createLink(9, 12);
-    G.createLink(10, 12);
-    G.createLink(11, 10);
-    G.createLink(12, 9);
-    G.createLink(12, 10);
-    G.createLink(13, 11);
-    G.createLink(13, 24);
-    G.createLink(13, 0);
-    G.createLink(14, 17);
-    G.createLink(14, 19);
-    G.createLink(15, 17);
-    G.createLink(15, 28);
-    G.createLink(16, 17);
-    G.createLink(16, 27);
-    G.createLink(17, 16);
-    G.createLink(17, 15);
-    G.createLink(17, 14);
-    G.createLink(18, 16);
-    G.createLink(19, 14);
-    G.createLink(19, 20);
-    G.createLink(20, 18);
-    G.createLink(20, 31);
-    G.createLink(21, 5);
-    G.createLink(22, 4);
-    G.createLink(22, 17);
-    G.createLink(23, 30);
-    G.createLink(24, 13);
-    G.createLink(24, 26);
-    G.createLink(25, 28);
-    G.createLink(25, 32);
-    G.createLink(26, 30);
-    G.createLink(26, 24);
-    G.createLink(27, 3);
-    G.createLink(27, 16);
-    G.createLink(27, 26);
-    G.createLink(27, 2);
-    G.createLink(28, 25);
-    G.createLink(28, 15);
-    G.createLink(28, 29);
-    G.createLink(29, 29);
-    G.createLink(30, 26);
-    G.createLink(30, 29);
-    G.createLink(31, 32);
-    G.createLink(32, 31);
-    G.createLink(32, 23);
-    G.createLink(32, 25);
-
-    /*All the information stated below is going to change to member objects along with the use of overloaded fucntions >> and <<*/
-//    std::cout << "Enter three starting integers to see there shortest path to three destination nodes\n";
-//    int src_one, src_two, src_three;
-//    std::cin >> src_one >> src_two >> src_three;
-//    std::cout << "Enter three destination nodes as integers\n";
-//    int dest_one, dest_two, dest_three;
-//    std::cin >> dest_one >> dest_two >> dest_three;
-    
-//    G.print(src_one, dest_one, dest_two, dest_three);
+    readData(G);
     G.print(7, 32, 22, 3);
+    G.print(19, 32, 22, 3);
+    G.print(26, 32, 22, 3);
+    
     return 0;
 }
 
