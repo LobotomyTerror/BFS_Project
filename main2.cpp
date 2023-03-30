@@ -281,7 +281,10 @@ void readData(Graph<int>& G) {
 
     //read in from file
     std::ifstream fin;
-    fin.open("/Users/danielfishbein/Documents/computerProjects/Xcode/Test/Test/data.txt");
+    ///
+    //Users/jkswe/projects/bfsGraph/BFS_PROJECT/data.txt
+    //Test does this work
+    fin.open("Users/danielfishbein/Documents/computerProjects/Xcode/Test/Test/data.txt");
     if (!fin)
     {
         std::cerr << "Error opening file\n";
@@ -341,4 +344,3 @@ int main(int argc, const char * argv[])
     
     return 0;
 }
-
