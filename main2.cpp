@@ -232,7 +232,7 @@ void Graph<T>::print(T src, T dest_one, T dest_two, T dest_three)
         pred[i] = 0;
     }
     BFS(src, pathTo, distTo, pred);
-    int *p = 0;
+    //int *p = 0;
     
     for (int i = 0; i < numOfVertices; ++i)
     {
@@ -241,29 +241,24 @@ void Graph<T>::print(T src, T dest_one, T dest_two, T dest_three)
             //std::cout << pathTo[i] << ' ';
             int pnode = pred[i];
             int cnode = pathTo[i];
-            p[i] = cnode;
-            std::cout << p[i] << ' ';
+            //p[i] = cnode;
+            //std::cout << p[i] << ' ';
 //            int tempArr[distTo[i] + 1];
             
             for (int j = i - 1; j >= 0; --j)
             {
-//                tempArr[j - 1] = cnode;
                 if (pathTo[j] == pnode)
                 {
-                    if (pnode != -1)
-                        p[j] = pnode;
+                    std::cout << pathTo[i] << ' ';
+                    //if (pnode != -1)
+                       // p[j] = pnode;
                     pnode = pred[j];
-                    std::cout << p[j] << ' ';
+                    //std::cout << p[j] << ' ';
                 }
             }
             std::cout << '\n';
-            for (int k = 0; k < sizeof(*p) - 1; ++k)
-                std::cout << p[k] << ' ';
-//            for (int k = 0; k < sizeof(tempArr) / sizeof(int); ++k)
-//            {
-//                std::cout << tempArr[k] << ' ';
-//            }
-//            //tempArr[0];
+            //for (int k = 0; k < sizeof(*p) - 1; ++k)
+                //std::cout << p[k] << ' ';
         }
     }
 }
