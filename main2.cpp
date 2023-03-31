@@ -83,8 +83,7 @@ void Graph<T>::createLink(T v, T e)
     Node<T>* temp2 = new Node<T>(e);
     Node<T>* last_node;
     Node<T>* first_node;
-    
-    if (temp1->data == temp2->data)
+    if (temp1 == temp2)
     {
         temp1 = temp2;
         adj[v] = temp1;
@@ -113,7 +112,6 @@ Node<T>* Graph<T>::getData()
 {
     return this->head;
 }
-
 
 template<typename T>
 int Graph<T>::getSize()
@@ -248,9 +246,6 @@ void Graph<T>::print(T src, T dest_one, T dest_two, T dest_three)
 //            tempArr[i - 2] = cnode;
 
             for (int j = i; j >= 0; --j)
-//            tempArr[i - 2] = cnode;
-
-            for (int j = i; j >= 0; --j)
             {
                 if (pathTo[j] == pnode)
                 {
@@ -267,7 +262,6 @@ void Graph<T>::print(T src, T dest_one, T dest_two, T dest_three)
 
                     std::cout << pathTo[j] << ' ';
                     pnode = pred[j];
-                    //cnode = pnode;
                     //cnode = pnode;
                 }
             }
@@ -319,7 +313,8 @@ void readData(Graph<int>& G) {
 
     //read in from file
     std::ifstream fin;
-    fin.open("/Users/danielfishbein/Documents/computerProjects/Xcode/Test/Test/data.txt");
+    ///Users/danielfishbein/Documents/computerProjects/Xcode/BFS/BFS/data.txt
+    fin.open("data.txt");
     if (!fin)
     {
         std::cerr << "Error opening file\n";
@@ -361,8 +356,8 @@ void readData(Graph<int>& G) {
         
         //Convert substring to an int
         node2 = atoi(cnode2);
-
-        //std::cout << node1 << ", " << node2 << std::endl;
+        
+        // std::cout << node1 << ", " << node2 << std::endl;
         G.createLink(node1, node2);
     }
     fin.close();
@@ -373,15 +368,17 @@ int main(int argc, const char * argv[])
     Graph<int> G;
     readData(G);
     
-    std::cout << "Enter three sources:\n";
-    int src_o, src_t, src_th;
-    std::cin >> src_o >> src_t >> src_th;
-    std::cout << "Enter three destinations:\n";
-    int dest_o, dest_t, dest_th;
-    std::cin >> dest_o >> dest_t >> dest_th;
-    G.print(src_o, dest_o, dest_t, dest_th);
-    G.print(src_t, dest_o, dest_t, dest_th);
-    G.print(src_th, dest_o, dest_t, dest_th);
+//    std::cout << "Enter three sources:\n";
+//    int src_o, src_t, src_th;
+//    std::cin >> src_o >> src_t >> src_th;
+//    std::cout << "Enter three destinations:\n";
+//    int dest_o, dest_t, dest_th;
+//    std::cin >> dest_o >> dest_t >> dest_th;
+    G.print(7, 32, 22, 3);
+    // G.print(19, 32, 22, 3);
+    // G.print(26, 32, 22, 3);
+//    G.print(src_t, dest_o, dest_t, dest_th);
+//    G.print(src_th, dest_o, dest_t, dest_th);
     
     return 0;
 }
