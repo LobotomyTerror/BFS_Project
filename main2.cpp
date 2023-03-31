@@ -38,7 +38,7 @@ private:
 public:
     Graph();
     ~Graph();
-    void initGraph(int V);
+    void initGraph(int);
     void createLink(T, T);
     void print(T, T, T, T);
     void BFS(T, int*, int*, int*);
@@ -60,7 +60,7 @@ Graph<T>::~Graph()
 {
     for (int i = 0; i < numOfVertices; ++i)
         delete adj[i];
-    delete adj;
+    delete[] adj;
 }
 
 template<typename T>
@@ -83,12 +83,10 @@ void Graph<T>::createLink(T v, T e)
     Node<T>* temp2 = new Node<T>(e);
     Node<T>* last_node;
     Node<T>* first_node;
-    
-    if (temp1->data == temp2->data)
+    if (temp1 == temp2)
     {
         temp1 = temp2;
         adj[v] = temp1;
-        ++numOfVertices;
     }
     else if (adj[v] == nullptr)
     {
@@ -96,7 +94,6 @@ void Graph<T>::createLink(T v, T e)
         last_node = temp2;
         first_node->next = last_node;
         adj[v] = first_node;
-        ++numOfVertices;
     }
     else
     {
@@ -108,6 +105,12 @@ void Graph<T>::createLink(T v, T e)
         adj[v] = first_node;
     }
     ++numOfEdges;
+}
+
+template<typename T>
+Node<T>* Graph<T>::getData()
+{
+    return this->head;
 }
 
 template<typename T>
@@ -147,12 +150,6 @@ void Graph<T>::dequeue()
     
     --size;
     delete temp;
-}
-
-template<typename T>
-Node<T>* Graph<T>::getData()
-{
-    return this->head;
 }
 
 //Breadth-first search to find the shortest path from a
@@ -219,48 +216,81 @@ void Graph<T>::print(T src, T dest_one, T dest_two, T dest_three)
     //these three will be used to store each node,
     //which node is a predecessor of that node, and
     //the number of edges from the src node
-    
+    int index = 0;
     //three array declrations
     int pathTo[numOfVertices];
     int distTo[numOfVertices];
     int pred[numOfVertices];
+    int tempArr[numOfVertices];
+    
     
     for (int i = 0; i < numOfVertices; ++i) //init of the three arrays
     {
         pathTo[i] = 0;
         distTo[i] = 0;
         pred[i] = 0;
+        tempArr[i] = 0;
     }
     BFS(src, pathTo, distTo, pred);
-    //int *p = 0;
     
     for (int i = 0; i < numOfVertices; ++i)
     {
         if (pathTo[i] == dest_one || pathTo[i] == dest_two || pathTo[i] == dest_three)
         {
-            //std::cout << pathTo[i] << ' ';
+            //int tempArr[distTo[i] + 1];
+            std::cout << pathTo[i] << ' ';
+            tempArr[index] = pathTo[i];
+            index++;
             int pnode = pred[i];
             int cnode = pathTo[i];
-            //p[i] = cnode;
-            //std::cout << p[i] << ' ';
-//            int tempArr[distTo[i] + 1];
-            
-            for (int j = i - 1; j >= 0; --j)
+//            tempArr[i - 2] = cnode;
+
+            for (int j = i; j >= 0; --j)
             {
                 if (pathTo[j] == pnode)
                 {
-                    std::cout << pathTo[i] << ' ';
-                    //if (pnode != -1)
-                       // p[j] = pnode;
+//                    tempArr[j] = pnode;
+                    
+                    if(j == 0) {
+                        tempArr[index] = pathTo[j];
+                        tempArr[index+1] = -1;
+                        index += 2;
+                    } else {
+                        tempArr[index] = pathTo[j];
+                        index++;
+                    }
+
+                    std::cout << pathTo[j] << ' ';
                     pnode = pred[j];
-                    //std::cout << p[j] << ' ';
+                    //cnode = pnode;
                 }
             }
             std::cout << '\n';
-            //for (int k = 0; k < sizeof(*p) - 1; ++k)
-                //std::cout << p[k] << ' ';
+//            for (int k = 0; k < sizeof(tempArr) / sizeof(int); ++k)
+//                std::cout << tempArr[k] << ' ';
+        //    std::cout << '\n';
         }
     }
+    int tempArr2[index];
+    int index2 = 0;
+    for(int i = 0; i < numOfVertices; i++) {
+        if(tempArr[i+1] == 0 && tempArr[i+2] == 0 && tempArr[i+3] == 0) {
+            for(int j = i; j >= 0; j--) {
+                tempArr2[index2] = tempArr[j];
+                index2++;
+            }
+            // std::cout << '\n';
+            break;
+        }
+    }
+    for(int i = 0; i < index2; i++) {
+        if(tempArr2[i] == -1) {
+            std::cout << '\n';
+        } else {
+            std::cout << tempArr2[i] << ' ';
+        }
+    }
+    
 }
 
 
@@ -268,11 +298,13 @@ void Graph<T>::print(T src, T dest_one, T dest_two, T dest_three)
 //Because we can't use the string library, I had to find some creative ways to make a sub-Cstring
 //It's kind of ugly but it works
 void readData(Graph<int>& G) {
-    G.initGraph(0);
     int node1 = 0;
     int node2 = 0;
     int comma = 0;
+    int initNum = 0;
     char fileline[10] = "6, 9";
+    char initiziler[10] = " ";
+    char cinit[10] = " ";
     //char nodes for sub-Cstrings
     char cnode1[10] = "   ";
     char cnode2[10] = "   ";
@@ -281,12 +313,19 @@ void readData(Graph<int>& G) {
 
     //read in from file
     std::ifstream fin;
-    fin.open("/Users/danielfishbein/Documents/computerProjects/Xcode/Test/Test/data.txt");
+    ///Users/danielfishbein/Documents/computerProjects/Xcode/BFS/BFS/data.txt
+    fin.open("data.txt");
     if (!fin)
     {
         std::cerr << "Error opening file\n";
         return;
     }
+    //Grabs the total amount of vertices from the text file
+    fin.getline(initiziler, 100, '\n');
+    strncpy(cinit, initiziler, '\n');
+    initNum = atoi(cinit);
+    G.initGraph(initNum);
+    
     //store data in fileline
     while(fin.getline(fileline, 100)) {
         for(int i = 0; i < 10; i++) {
@@ -296,10 +335,10 @@ void readData(Graph<int>& G) {
                 break;
             }
         }
-
+        
         //Make a substring for the first node based on where the comma is
         strncpy(cnode1, fileline, comma);
-
+        
         //Convert that substring to an int
         node1 = atoi(cnode1);
         
@@ -311,14 +350,14 @@ void readData(Graph<int>& G) {
             }
             fileline[i] = ' ';
         }
-
+        
         //Make substring for second node
         strncpy(cnode2, fileline, 10);
-
+        
         //Convert substring to an int
         node2 = atoi(cnode2);
-
-        //std::cout << node1 << ", " << node2 << std::endl;
+        
+        // std::cout << node1 << ", " << node2 << std::endl;
         G.createLink(node1, node2);
     }
     fin.close();
@@ -329,16 +368,17 @@ int main(int argc, const char * argv[])
     Graph<int> G;
     readData(G);
     
-    std::cout << "Enter three sources:\n";
-    int src_o, src_t, src_th;
-    std::cin >> src_o >> src_t >> src_th;
-    std::cout << "Enter three destinations:\n";
-    int dest_o, dest_t, dest_th;
-    std::cin >> dest_o >> dest_t >> dest_th;
-    G.print(src_o, dest_o, dest_t, dest_th);
-    G.print(src_t, dest_o, dest_t, dest_th);
-    G.print(src_th, dest_o, dest_t, dest_th);
+//    std::cout << "Enter three sources:\n";
+//    int src_o, src_t, src_th;
+//    std::cin >> src_o >> src_t >> src_th;
+//    std::cout << "Enter three destinations:\n";
+//    int dest_o, dest_t, dest_th;
+//    std::cin >> dest_o >> dest_t >> dest_th;
+    G.print(7, 32, 22, 3);
+    // G.print(19, 32, 22, 3);
+    // G.print(26, 32, 22, 3);
+//    G.print(src_t, dest_o, dest_t, dest_th);
+//    G.print(src_th, dest_o, dest_t, dest_th);
     
     return 0;
 }
-
