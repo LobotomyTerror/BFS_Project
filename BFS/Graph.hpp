@@ -223,6 +223,7 @@ void Graph<T>::print(T src, T dest_one, T dest_two, T dest_three)
     int distTo[numOfVertices];
     int pred[numOfVertices];
     int tempArr[numOfVertices];
+    int Indexone[numOfVertices];
     
     
     for (int i = 0; i < numOfVertices; ++i) //init of the three arrays
@@ -231,6 +232,7 @@ void Graph<T>::print(T src, T dest_one, T dest_two, T dest_three)
         distTo[i] = 0;
         pred[i] = 0;
         tempArr[i] = 0;
+        Indexone[i] = 0;
     }
     BFS(src, pathTo, distTo, pred);
     
@@ -259,25 +261,21 @@ void Graph<T>::print(T src, T dest_one, T dest_two, T dest_three)
             }
         }
     }
-    int tempArr2[index];
-    int index2 = 0;
+    
     for(int i = 0; i < numOfVertices; i++) {
         if(tempArr[i+1] == 0 && tempArr[i+2] == 0 && tempArr[i+3] == 0) {
             for(int j = i; j >= 0; j--) {
-                tempArr2[index2] = tempArr[j];
-                index2++;
+                if(tempArr[j] == -1) {
+                    std::cout << '\n';
+                    //std::cout << "Source: " << tempArr[i-1] << std::endl;   
+                } else {
+                    std::cout << tempArr[j] << ' ';
+                }
             }
             break;
         }
     }
-    for(int i = 0; i < index2; i++) {
-        if(tempArr2[i] == -1) {
-            std::cout << '\n';
-        }
-        else {
-            std::cout << tempArr2[i] << ' ';
-        }
-    }
+    std::cout << '\n';
 }
 
 #endif /* Graph_h */
