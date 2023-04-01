@@ -1,3 +1,4 @@
+
 #ifndef Node_h
 #define Node_h
 template<typename T>
