@@ -1,10 +1,3 @@
-//
-//  Node.hpp
-//  BFS
-//
-//  Created by Daniel Fishbein on 3/31/23.
-//
-
 #ifndef Node_h
 #define Node_h
 template<typename T>
