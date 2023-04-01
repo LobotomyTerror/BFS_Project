@@ -1,12 +1,28 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
+#include <chrono>
+#include <format>
 #include "Graph.hpp"
 #include "Node.hpp"
 
+using namespace std::chrono;
 //This function reads in ordered pairs and populates our graph
 //Because we can't use the string library, I had to find some creative ways to make a sub-Cstring
 //It's kind of ugly but it works
+void getTime()
+{
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+    std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
+    std::chrono::milliseconds now2 = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+    struct tm currentLocalTime;
+    localtime_r(&currentTime, &currentLocalTime);
+    char timeBuffer[80];
+    std::size_t charCount { std::strftime( timeBuffer, 80, "%D %T", &currentLocalTime)};
+    if (charCount == 0) return;
+    std::cout << "Date and time of code execution ";
+    std::cout << timeBuffer << "." << std::setfill('0') << std::setw(3) << now2.count() % 1000 << std::endl;
+}
 void readData(Graph<int>& G, std::ifstream &fin) {
     int node1 = 0;
     int node2 = 0;
@@ -80,6 +96,7 @@ void readData(Graph<int>& G, std::ifstream &fin) {
 
 int main(int argc, const char * argv[])
 {
+    auto start = std::chrono::high_resolution_clock::now();
     std::ofstream outf;
     std::ifstream inf;
     int src_o, src_t, src_th;
@@ -136,6 +153,12 @@ int main(int argc, const char * argv[])
         exit(1);
     }
     std::cerr.rdbuf(stream_buffer_cerr);
-    
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration1 = duration_cast<std::chrono::seconds>(stop - start);
+    std::cout << "Total program run time took " << duration1.count() << " seconds\n";
+    getTime();
+    std::cout << "Program has terminated succesefully. Live long and prosper\n";
+
     return 0;
 }
+
