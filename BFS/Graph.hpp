@@ -1,9 +1,3 @@
-//
-//  Graph.hpp
-//  BFS
-//
-//  Created by Daniel Fishbein on 3/31/23.
-//
 #include "Node.hpp"
 #include <iostream>
 #include <chrono>
