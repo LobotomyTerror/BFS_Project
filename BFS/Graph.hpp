@@ -115,7 +115,7 @@ template<typename T>
 void Graph<T>::enqueue(T d)
 {
     try {
-        Node<T>* new_node = new Node(d);
+        Node<T>* new_node = new Node<T>(d);
         if (tail == nullptr)
         {
             tail = head = new_node;
@@ -238,7 +238,7 @@ void Graph<T>::print(T src, T dest_one, T dest_two, T dest_three)
     auto stop = high_resolution_clock::now();
     auto duration1 = duration_cast<std::chrono::nanoseconds>(stop - start);
     
-    std::cout << "Finding the shortest path took from source: " << src << " took " << duration1.count() << " nanoseconds";
+    std::cout << "Finding the shortest path from source: " << src << " took " << duration1.count() << " nanoseconds";
     
     for (int i = 0; i < numOfVertices; ++i)
     {
