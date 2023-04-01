@@ -237,7 +237,7 @@ void Graph<T>::print(T src, T dest_one, T dest_two, T dest_three)
             tempArr[index] = pathTo[i];
             index++;
             int pnode = pred[i];
-
+            
             for (int j = i; j >= 0; --j)
             {
                 if (pathTo[j] == pnode)
@@ -261,7 +261,24 @@ void Graph<T>::print(T src, T dest_one, T dest_two, T dest_three)
             for(int j = i; j >= 0; j--) {
                 if(tempArr[j] == -1) {
                     std::cout << '\n';
-                    //std::cout << "Source: " << tempArr[i-1] << std::endl;   
+                    std::cout << "Source: " << tempArr[i-1] << ' ';
+                    for (int k = j - 1; k >= 0; --k){
+                        if (tempArr[k] == -1 || k == 0){
+                            if (tempArr[k + 1] == dest_one || tempArr[k] == dest_one){
+                                std::cout << "Destination: " << dest_one << std::endl;
+                                break;
+                            }
+                            if (tempArr[k + 1] == dest_two || tempArr[k] == dest_two){
+                                std::cout << "Destination: " << dest_two << std::endl;
+                                break;
+                            }
+                                
+                            if (tempArr[k] == dest_three || tempArr[k + 1] == dest_three){
+                                std::cout << "Destination: " << dest_three << std::endl;
+                                break;
+                            }
+                        }
+                    }
                 } else {
                     std::cout << tempArr[j] << ' ';
                 }
