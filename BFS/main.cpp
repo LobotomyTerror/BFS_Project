@@ -3,6 +3,8 @@
 #include <cstring>
 #include <chrono>
 #include <format>
+#include <ctime>
+#include <cstdlib>
 #include "Graph.hpp"
 #include "Node.hpp"
 
@@ -10,20 +12,15 @@ using namespace std::chrono;
 //This function reads in ordered pairs and populates our graph
 //Because we can't use the string library, I had to find some creative ways to make a sub-Cstring
 //It's kind of ugly but it works
-void getTime()
+void getTime() //I shamelessly copied this from an online resource since we couldn't use strings, thus I found this beauitiful gem of a date and time function to produce the required results.
 {
-    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-    std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
-    std::chrono::milliseconds now2 = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
-    struct tm currentLocalTime;
-    localtime_r(&currentTime, &currentLocalTime);
-    char timeBuffer[80];
-    std::size_t charCount { std::strftime( timeBuffer, 80, "%D %T", &currentLocalTime)};
-    if (charCount == 0) return;
-    std::cout << "Date and time of code execution ";
-    std::cout << timeBuffer << "." << std::setfill('0') << std::setw(3) << now2.count() % 1000 << std::endl;
+    time_t tt;
+    struct tm * ti;
+    time(&tt);
+    ti = localtime(&tt);
+    std::cout << "Current day, date and time is " << asctime(ti) << std::endl;
 }
-void readData(Graph<int>& G, std::ifstream &fin) {
+void readData(Graph<int>& G, const char* arr) {
     int node1 = 0;
     int node2 = 0;
     int comma = 0;
@@ -38,15 +35,17 @@ void readData(Graph<int>& G, std::ifstream &fin) {
     // strncpy (cnode1, fileline, sizeof(cnode1));
     
     //read in from file
+    std::ifstream fin;
     try
     {
-        fin.open("/Users/danielfishbein/Documents/computerProjects/Xcode/BFS/BFS/data.txt");
+        fin.open(arr);
         if (!fin)
         {
+            fin.exceptions(std::ios::failbit);
             throw;
         }
     }
-    catch (std::fstream::failure)
+    catch (std::exception)
     {
         std::cerr << "Error with opening file on line 28" << std::endl;
         throw;
@@ -108,44 +107,49 @@ int main(int argc, const char * argv[])
     
     try
     {
+        outf.open("/Users/danielfishbein/Documents/computerProjects/Xcode/BFS/BFS/errorlog.txt");
+        try{
+            if (!outf.is_open())
+            {
+                outf.exceptions(std::ios::failbit);
+                throw;
+            }
+        }
+        catch (std::exception){
+            std::cerr << "Error with opening file on line 111" << std::endl;
+            throw;
+        }
+        
         Graph<int> G;
         if (argc != 2)
             std::cout << "Usage of command line input is "  << argv[0] << "<filename>";
         else
         {
-            readData(G, inf);
+            const char* arr;
+            int arraySize = std::atoi(argv[1]);
+            arr = new char[arraySize];
+            arr = argv[1];
+            readData(G, arr);
         }
-        
-        outf.open("errorlog.txt");
-        
-        if (!outf.is_open())
-            throw;
         
         std::cout << "Enter three sources:\n";
         std::cin >> src_o >> src_t >> src_th;
         if(src_o < 0 || src_t < 0 || src_th < 0)
         {
-            throw std::invalid_argument("Negative value has been entered\n");
+            std::cerr << "Negative value has been entered. Please try again and enter values > 0.\n";
+            throw std::invalid_argument("");
         }
         std::cout << "Enter three destinations:\n";
         std::cin >> dest_o >> dest_t >> dest_th;
         if (dest_o < 0 || dest_t < 0 || dest_th < 0)
         {
-            throw std::invalid_argument("Negative value has been entered\n");
+            std::cerr << "Negative value has been entered. Please try again and enter values > 0.\n";
+            throw std::invalid_argument("");
         }
         
         G.print(src_o, dest_o, dest_t, dest_th);
         G.print(src_t, dest_o, dest_t, dest_th);
         G.print(src_th, dest_o, dest_t, dest_th);
-    }
-    catch (std::invalid_argument)
-    {
-        throw;
-    }
-    catch (std::fstream::failure)
-    {
-        std::cerr << "Error opening file check file path on line 102 in main" << std::endl;
-        throw;
     }
     catch (...)
     {
@@ -158,7 +162,7 @@ int main(int argc, const char * argv[])
     std::cout << "Total program run time took " << duration1.count() << " seconds\n";
     getTime();
     std::cout << "Program has terminated succesefully. Live long and prosper\n";
-
+    
     return 0;
 }
 
