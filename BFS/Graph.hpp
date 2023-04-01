@@ -1,7 +1,16 @@
+//
+//  Graph.hpp
+//  BFS
+//
+//  Created by Daniel Fishbein on 3/31/23.
+//
 #include "Node.hpp"
 #include <iostream>
+#include <chrono>
 #ifndef Graph_h
 #define Graph_h
+
+using namespace std::chrono;
 
 template<typename T>
 class Graph : public Node<T>
@@ -204,6 +213,7 @@ void Graph<T>::BFS(T src, int *pathTo, int *destTo, int *pred)
     }
 }
 
+
 template<typename T>
 void Graph<T>::print(T src, T dest_one, T dest_two, T dest_three)
 {
@@ -228,7 +238,13 @@ void Graph<T>::print(T src, T dest_one, T dest_two, T dest_three)
         tempArr[i] = 0;
         Indexone[i] = 0;
     }
+    
+    auto start = high_resolution_clock::now();
     BFS(src, pathTo, distTo, pred);
+    auto stop = high_resolution_clock::now();
+    auto duration1 = duration_cast<std::chrono::nanoseconds>(stop - start);
+    
+    std::cout << "Finding the shortest path took from source: " << src << " took " << duration1.count() << " nanoseconds";
     
     for (int i = 0; i < numOfVertices; ++i)
     {
@@ -265,16 +281,19 @@ void Graph<T>::print(T src, T dest_one, T dest_two, T dest_three)
                     for (int k = j - 1; k >= 0; --k){
                         if (tempArr[k] == -1 || k == 0){
                             if (tempArr[k + 1] == dest_one || tempArr[k] == dest_one){
-                                std::cout << "Destination: " << dest_one << std::endl;
+                                std::cout << "Destination: " << dest_one << ' ';
+                                std::cout << "Distance from source " << distTo[dest_one] << std::endl;
                                 break;
                             }
                             if (tempArr[k + 1] == dest_two || tempArr[k] == dest_two){
-                                std::cout << "Destination: " << dest_two << std::endl;
+                                std::cout << "Destination: " << dest_two << ' ';
+                                std::cout << "Distance from source " << distTo[dest_two] << std::endl;
                                 break;
                             }
                                 
                             if (tempArr[k] == dest_three || tempArr[k + 1] == dest_three){
-                                std::cout << "Destination: " << dest_three << std::endl;
+                                std::cout << "Destination: " << dest_three << ' ';
+                                std::cout << "Distance from source " << distTo[dest_three] << std::endl;
                                 break;
                             }
                         }
